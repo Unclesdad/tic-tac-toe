@@ -6,13 +6,12 @@ public class Board {
     public Status[][] board = new Status[3][3];
 
     public Board() {
-        System.out.print("Let's play Tic Tac Toe!");
+        System.out.print("Let's play Tic Tac Toe! \n");
         for (int column = 0; column < 3; column++) {
             for (int row = 0; row < 3; row++) {
                 board[column][row] = Status.NONE;
             }
         }
-        printBoard();
     }
 
     public static int enumToInt(Column col) {
@@ -62,7 +61,7 @@ public class Board {
     public boolean checkVerticals() {
         boolean win = false;
         for (int col = 0; col < 3; col++) {
-            win =  win || (board[col][0] == board[col][1]) && (board[col][0] == board[col][2]);
+            win =  win || ((board[col][0] == board[col][1]) && (board[col][1] == board[col][2]) && (board[col][1] != Status.NONE));
         }
         return win;
     }
@@ -70,17 +69,27 @@ public class Board {
     public boolean checkHorizontals() {
         boolean win = false;
         for (int ro = 0; ro < 3; ro++) {
-            win =  win || (board[ro][0] == board[ro][1]) && (board[ro][0] == board[ro][2]);
+            win =  win || (board[0][ro] == board[1][ro] && (board[1][ro] == board[2][ro]) && (board[2][ro] != Status.NONE));
         }
         return win;
     }
 
     public boolean checkDiagonals() {
-        return (board[1][1] == board[0][0] && board[1][1] == board[2][2]) 
-        || (board[1][1] == board[2][0] && board[1][1] == board[0][2]);
+        return (board[1][1] == board[0][0] && board[1][1] == board[2][2] && board[1][1] != Status.NONE) 
+        || (board[1][1] == board[2][0] && board[1][1] == board[0][2] && board[1][1] != Status.NONE);
+        
     }
 
     public boolean checkWin() {
+        if (checkHorizontals()) {
+            System.out.println("HORIZONTALS");
+        }
+        if (checkVerticals()) {
+            System.out.println("VERTICALS");
+        }
+        if (checkDiagonals()) {
+            System.out.println("DIAGONALS");
+        }
         return checkVerticals() || checkHorizontals() || checkDiagonals();
     }
 
@@ -91,25 +100,25 @@ public class Board {
             case "top left":
                 inputColumn = Column.left;
                 inputRow = Row.top;
-            case "top middle":
+            case "top":
                 inputColumn = Column.middle;
                 inputRow = Row.top;
             case "top right":
                 inputColumn = Column.right;
                 inputRow = Row.top;
-            case "middle left":
+            case "left":
                 inputColumn = Column.left;
                 inputRow = Row.middle;
             case "middle":
                 inputColumn = Column.middle;
                 inputRow = Row.middle;
-            case "middle right":
+            case "right":
                 inputColumn = Column.right;
                 inputRow = Row.middle;
             case "bottom left":
                 inputColumn = Column.left;
                 inputRow = Row.bottom;
-            case "bottom middle":
+            case "bottom":
                 inputColumn = Column.middle;
                 inputRow = Row.bottom;
             case "bottom right":
@@ -119,25 +128,37 @@ public class Board {
             inputColumn = Column.left;
             inputRow = Row.bottom;
         }
-        board[enumToInt(inputColumn)][enumToInt(inputRow)] = changer;
+        if (getStatus(inputColumn, inputRow) == Status.NONE) {
+            place(inputColumn, inputRow, changer);
+        }
+        else {
+            System.out.println("Sorry, that spot is taken.");
+            turnModule(changer);
+        }
     }
 
-    public void play() {
+    public void turnModule(Status player) {
         printBoard();
-        System.out.println("Where would you like to place the X?");
-        String placex = System.console().readLine();
-        inputThenEdit(placex, Status.X);
-        if (checkWin()) {
-            System.out.println("Player X won!");
-        }
+            System.out.println("Where would you like to place the " + statusToString(player) + "? \n");
+            String placer = System.console().readLine();
+            inputThenEdit(placer, player);
+    }
 
-        printBoard();
-        System.out.println("Where would you like to place the O?");
-        String placeo = System.console().readLine();
-        inputThenEdit(placeo, Status.O);
-        if (checkWin()) {
-            System.out.println("Player O won!");
-        }
+    public Status play() {
+        Status winner = Status.NONE;
+        while (winner == Status.NONE) {
+            turnModule(Status.X);
+            if (checkWin()) {
+                winner = Status.X;
+                return winner;
+            }
 
+            turnModule(Status.O);
+            if (checkWin()) {
+                winner = Status.O;
+                return winner;
+            } 
+        }
+        return winner;
     }
 }
