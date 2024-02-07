@@ -5,9 +5,10 @@ public class Board {
     public static enum Column {left, middle, right};
     public static enum Row {top, middle, bottom};
 
-    Scanner scanner = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);
 
-    public static final int BOARDWIDTH = 3;
+    
+    public static final int BOARDWIDTH = scanner.nextInt();
     public static final int SETBOARDWIDTH = BOARDWIDTH - 1;
 
     int turnCount = 0;
@@ -15,7 +16,7 @@ public class Board {
     Status[][] board = new Status[BOARDWIDTH][BOARDWIDTH];
 
     public Board() {
-        System.out.print("Let's play Tic Tac Toe! \n");
+        System.out.print("Alright then, let's play Tic Tac Toe!\n");
         for (int column = 0; column < BOARDWIDTH; column++) {
             for (int row = 0; row < BOARDWIDTH; row++) {
                 board[column][row] = Status.NONE;
@@ -44,7 +45,7 @@ public class Board {
         switch(s) {
             case X: return "X";
             case O: return "O";
-            case NONE: return "n";
+            case NONE: return "-";
             default: return "ERROR";
         }
     }

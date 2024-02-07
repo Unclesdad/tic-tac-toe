@@ -1,6 +1,8 @@
 public class Main {
     
     public static void main(String[] args) {
+        System.out.println("Please enter board width:");
+
         Board playBoard = new Board();
 
         Board.Status winner = playBoard.play();
