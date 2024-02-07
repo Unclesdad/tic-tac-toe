@@ -59,19 +59,34 @@ public class Board {
         board[targColumn][targRow] = piece;
     }
 
+    public void controlledPlace(int targColumn, int targRow, Status piece) {
+        if (board[targColumn][targRow] == Status.NONE) {
+            place(targColumn, targRow, piece);
+        }
+        else {
+            System.out.println("Sorry, that spot is taken.");
+            turnModule(piece);
+        }
+    }
     /* only in use for three-wide boards
     public Status getStatus(Column targColumn, Row targRow) {
         return board[enumToInt(targColumn)][enumToInt(targRow)];
     } */
 
     public void printBoard() {
+        String fullRow;
         for (int row = 0; row < BOARDWIDTH; row++) {
-            String fullRow = "";
+            fullRow = Integer.toString(BOARDWIDTH - row) + " ";
             for (int col = 0; col < BOARDWIDTH; col++) {
                 fullRow += statusToString(board[col][row]) + " ";
             }
             System.out.println(fullRow);
         }
+        fullRow = "  ";
+        for (int col = 0; col < BOARDWIDTH; col++) {
+            fullRow += Integer.toString(col + 1) + " ";
+        }
+        System.out.println(fullRow);
     }
 
     public boolean checkVerticals() {
@@ -221,9 +236,11 @@ public class Board {
         printBoard();
             System.out.println("In which column would you like to place the " + statusToString(player) + "? \n");
             int placerColumn = scanner.nextInt();
+            printBoard();
             System.out.println("In which row would you like to place the " + statusToString(player) + "? \n");
             int placerRow = scanner.nextInt();
-            place(placerColumn - 1, placerRow - 1, player);
+            System.out.println("\n\n");
+            controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, player);
     }
 
     public Status play() {
