@@ -4,6 +4,7 @@ public class Main {
         Board playBoard = new Board();
 
         System.out.println("Player " + Board.statusToString(playBoard.play()) + " won! Congratulations!");
+        playBoard.printBoard();
     }
     
     

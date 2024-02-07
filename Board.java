@@ -1,9 +1,13 @@
+import java.util.Scanner;
+
 public class Board {
     public static enum Status {X, O, NONE};
     public static enum Column {left, middle, right};
     public static enum Row {top, middle, bottom};
 
-    public Status[][] board = new Status[3][3];
+    Scanner scanner = new Scanner(System.in);
+
+    Status[][] board = new Status[3][3];
 
     public Board() {
         System.out.print("Let's play Tic Tac Toe! \n");
@@ -81,6 +85,7 @@ public class Board {
     }
 
     public boolean checkWin() {
+        /* testing shit
         if (checkHorizontals()) {
             System.out.println("HORIZONTALS");
         }
@@ -89,49 +94,70 @@ public class Board {
         }
         if (checkDiagonals()) {
             System.out.println("DIAGONALS");
-        }
+        } */
         return checkVerticals() || checkHorizontals() || checkDiagonals();
+        
     }
 
     public void inputThenEdit(String position, Status changer) {
-        Column inputColumn;
-        Row inputRow;
+        Column inputColumn = Column.middle;
+        Row inputRow = Row.middle;
+        boolean recursion = false;
+
         switch(position) {
             case "top left":
                 inputColumn = Column.left;
                 inputRow = Row.top;
+                break;
             case "top":
                 inputColumn = Column.middle;
                 inputRow = Row.top;
+                break;
             case "top right":
                 inputColumn = Column.right;
                 inputRow = Row.top;
+                break;
             case "left":
                 inputColumn = Column.left;
                 inputRow = Row.middle;
+                break;
             case "middle":
                 inputColumn = Column.middle;
                 inputRow = Row.middle;
+                break;
             case "right":
                 inputColumn = Column.right;
                 inputRow = Row.middle;
+                break;
             case "bottom left":
                 inputColumn = Column.left;
                 inputRow = Row.bottom;
+                break;
             case "bottom":
                 inputColumn = Column.middle;
                 inputRow = Row.bottom;
+                break;
             case "bottom right":
                 inputColumn = Column.right;
                 inputRow = Row.bottom;
+                break;
+            case "help":
+                System.out.println("top\nleft\nbottom\nright\nmiddle\ntop left\nbottom left\nbottom right\ntop right\npress enter to continue.");
+                while (scanner.nextLine() != "") {
+                }
+                recursion = true;
+                turnModule(changer);
+                break;
+
             default:
-            inputColumn = Column.left;
-            inputRow = Row.bottom;
+                System.out.println("Unfortunately, that's not a valid input. for a list of valid inputs, type 'help'");
+                turnModule(changer);
+                break;
         }
-        if (getStatus(inputColumn, inputRow) == Status.NONE) {
+        if (getStatus(inputColumn, inputRow) == Status.NONE && recursion == false) {
             place(inputColumn, inputRow, changer);
         }
-        else {
+        else if (recursion == false){
             System.out.println("Sorry, that spot is taken.");
             turnModule(changer);
         }
@@ -140,7 +166,7 @@ public class Board {
     public void turnModule(Status player) {
         printBoard();
             System.out.println("Where would you like to place the " + statusToString(player) + "? \n");
-            String placer = System.console().readLine();
+            String placer = scanner.nextLine();
             inputThenEdit(placer, player);
     }
 
