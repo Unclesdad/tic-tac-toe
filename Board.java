@@ -7,14 +7,17 @@ public class Board {
 
     Scanner scanner = new Scanner(System.in);
 
+    public static final int BOARDWIDTH = 3;
+    public static final int SETBOARDWIDTH = BOARDWIDTH - 1;
+
     int turnCount = 0;
 
-    Status[][] board = new Status[3][3];
+    Status[][] board = new Status[BOARDWIDTH][BOARDWIDTH];
 
     public Board() {
         System.out.print("Let's play Tic Tac Toe! \n");
-        for (int column = 0; column < 3; column++) {
-            for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < BOARDWIDTH; column++) {
+            for (int row = 0; row < BOARDWIDTH; row++) {
                 board[column][row] = Status.NONE;
             }
         }
@@ -46,18 +49,25 @@ public class Board {
         }
     }
     
+    /* only in use for three-wide boards
     public void place(Column targColumn, Row targRow, Status piece) {
         board[enumToInt(targColumn)][enumToInt(targRow)] = piece;
     }
-    
-    public Status getStatus(Column targColumn, Row targRow) {
-        return board[enumToInt(targColumn)][enumToInt(targRow)];
+    */
+
+    public void place(int targColumn, int targRow, Status piece) {
+        board[targColumn][targRow] = piece;
     }
 
+    /* only in use for three-wide boards
+    public Status getStatus(Column targColumn, Row targRow) {
+        return board[enumToInt(targColumn)][enumToInt(targRow)];
+    } */
+
     public void printBoard() {
-        for (int row = 0; row < 3; row++) {
+        for (int row = 0; row < BOARDWIDTH; row++) {
             String fullRow = "";
-            for (int col = 0; col < 3; col++) {
+            for (int col = 0; col < BOARDWIDTH; col++) {
                 fullRow += statusToString(board[col][row]) + " ";
             }
             System.out.println(fullRow);
@@ -66,30 +76,50 @@ public class Board {
 
     public boolean checkVerticals() {
         boolean win = false;
-        for (int col = 0; col < 3; col++) {
-            win =  win || ((board[col][0] == board[col][1]) && (board[col][1] == board[col][2]) && (board[col][1] != Status.NONE));
+        for (int col = 0; col < BOARDWIDTH; col++) {
+            boolean set = board[col][0] != Status.NONE;
+            for (int g = 0; g < BOARDWIDTH; g++) {
+                set = set && board[col][0] == board[col][g];
+            }
+                
+            win =  win || set;
         }
         return win;
     }
 
     public boolean checkHorizontals() {
         boolean win = false;
-        for (int ro = 0; ro < 3; ro++) {
-            win =  win || (board[0][ro] == board[1][ro] && (board[1][ro] == board[2][ro]) && (board[2][ro] != Status.NONE));
+        for (int ro = 0; ro < BOARDWIDTH; ro++) {
+            boolean set = board[0][ro] != Status.NONE;
+            for (int g = 0; g < BOARDWIDTH; g++) {
+                set = set && board[0][ro] == board[g][ro];
+            }
+                
+            win =  win || set;
         }
         return win;
     }
 
     public boolean checkDiagonals() {
-        return (board[1][1] == board[0][0] && board[1][1] == board[2][2] && board[1][1] != Status.NONE) 
-        || (board[1][1] == board[2][0] && board[1][1] == board[0][2] && board[1][1] != Status.NONE);
+        //negative slope
+        boolean negSet = board[0][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            negSet = negSet && board[dia][dia] == board[0][0];
+        }
         
+        // positive slope
+
+        boolean posSet = board[SETBOARDWIDTH][0] != Status.NONE;
+        for (int dia = 0; dia < BOARDWIDTH; dia++) {
+            posSet = posSet && board[SETBOARDWIDTH - dia][dia] == board[SETBOARDWIDTH][0];
+        }
+        return posSet || negSet;
     }
 
     public boolean checkDraw() {
         boolean noDraw = false;
-        for (int column = 0; column < 3; column++) {
-            for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < BOARDWIDTH; column++) {
+            for (int row = 0; row < BOARDWIDTH; row++) {
                 noDraw = noDraw || board[column][row] == Status.NONE;
             }
         }
@@ -111,6 +141,7 @@ public class Board {
         
     }
 
+/* only in use for three-wide boards
     public void inputThenEdit(String position, Status changer) {
         Column inputColumn = Column.middle;
         Row inputRow = Row.middle;
@@ -154,7 +185,7 @@ public class Board {
                 inputRow = Row.bottom;
                 break;
             case "help":
-                System.out.println("top\nleft\nbottom\nright\nmiddle\ntop left\nbottom left\nbottom right\ntop right\npress enter to continue.");
+                System.out.println("Command list:\ntop\nleft\nbottom\nright\nmiddle\ntop left\nbottom left\nbottom right\ntop right\npress enter to continue.");
                 while (scanner.nextLine() != "") {
                 }
                 recursion = true;
@@ -164,6 +195,7 @@ public class Board {
             default:
                 System.out.println("Unfortunately, that's not a valid input. for a list of valid inputs, type 'help'");
                 turnModule(changer);
+                recursion = true;
                 break;
         }
         if (getStatus(inputColumn, inputRow) == Status.NONE && recursion == false) {
@@ -174,12 +206,24 @@ public class Board {
             turnModule(changer);
         }
     }
+*/ 
 
-    public void turnModule(Status player) {
+/* only in use for three-wide boards
+    public void turnModuleThree(Status player) {
         printBoard();
             System.out.println("Where would you like to place the " + statusToString(player) + "? \n");
             String placer = scanner.nextLine();
             inputThenEdit(placer, player);
+    }
+*/
+
+    public void turnModule(Status player) {
+        printBoard();
+            System.out.println("In which column would you like to place the " + statusToString(player) + "? \n");
+            int placerColumn = scanner.nextInt();
+            System.out.println("In which row would you like to place the " + statusToString(player) + "? \n");
+            int placerRow = scanner.nextInt();
+            place(placerColumn - 1, placerRow - 1, player);
     }
 
     public Status play() {
