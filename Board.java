@@ -7,6 +7,8 @@ public class Board {
 
     Scanner scanner = new Scanner(System.in);
 
+    int turnCount = 0;
+
     Status[][] board = new Status[3][3];
 
     public Board() {
@@ -82,6 +84,16 @@ public class Board {
         return (board[1][1] == board[0][0] && board[1][1] == board[2][2] && board[1][1] != Status.NONE) 
         || (board[1][1] == board[2][0] && board[1][1] == board[0][2] && board[1][1] != Status.NONE);
         
+    }
+
+    public boolean checkDraw() {
+        boolean noDraw = false;
+        for (int column = 0; column < 3; column++) {
+            for (int row = 0; row < 3; row++) {
+                noDraw = noDraw || board[column][row] == Status.NONE;
+            }
+        }
+        return !(noDraw);
     }
 
     public boolean checkWin() {
@@ -177,13 +189,18 @@ public class Board {
             if (checkWin()) {
                 winner = Status.X;
                 return winner;
+            } else if (checkDraw()) {
+                return winner;
             }
+
 
             turnModule(Status.O);
             if (checkWin()) {
                 winner = Status.O;
                 return winner;
-            } 
+            } else if (checkDraw()) {
+                return winner;
+            }
         }
         return winner;
     }
