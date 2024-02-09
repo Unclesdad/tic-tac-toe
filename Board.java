@@ -13,13 +13,15 @@ public class Board {
 
     int turnCount = 0;
 
-    Status[][] board = new Status[BOARDWIDTH][BOARDWIDTH];
+    Status[][][] board = new Status[BOARDWIDTH][BOARDWIDTH][BOARDWIDTH];
 
     public Board() {
         System.out.print("Alright then, let's play Tic Tac Toe!\n");
         for (int column = 0; column < BOARDWIDTH; column++) {
             for (int row = 0; row < BOARDWIDTH; row++) {
-                board[column][row] = Status.NONE;
+                for (int depth = 0; depth < BOARDWIDTH; depth++) {
+                    board[column][row][depth] = Status.NONE;
+                }
             }
         }
     }
@@ -56,13 +58,13 @@ public class Board {
     }
     */
 
-    public void place(int targColumn, int targRow, Status piece) {
-        board[targColumn][targRow] = piece;
+    public void place(int targColumn, int targRow, int targDepth, Status piece) {
+        board[targColumn][targRow][targDepth] = piece;
     }
 
-    public void controlledPlace(int targColumn, int targRow, Status piece) {
-        if (board[targColumn][targRow] == Status.NONE) {
-            place(targColumn, targRow, piece);
+    public void controlledPlace(int targColumn, int targRow, int targDepth, Status piece) {
+        if (board[targColumn][targRow][targDepth] == Status.NONE) {
+            place(targColumn, targRow, targDepth, piece);
         }
         else {
             System.out.println("Sorry, that spot is taken.");
@@ -75,68 +77,119 @@ public class Board {
     } */
 
     public void printBoard() {
-        String fullRow;
+        String fullRow = "  ";
+        for (int boardnum = 1; boardnum < BOARDWIDTH + 1; boardnum++) {
+            fullRow += Integer.toString(boardnum) + " ".repeat(BOARDWIDTH * 2 + 1);
+        }
+        System.out.println(fullRow);
+
         for (int row = 0; row < BOARDWIDTH; row++) {
             fullRow = Integer.toString(BOARDWIDTH - row) + " ";
-            for (int col = 0; col < BOARDWIDTH; col++) {
-                fullRow += statusToString(board[col][row]) + " ";
+            for (int dep = 0; dep < BOARDWIDTH; dep++) {
+                for (int col = 0; col < BOARDWIDTH; col++) {
+                    fullRow += statusToString(board[col][row][dep]) + " ";
+                }
+                fullRow += "  ";
             }
             System.out.println(fullRow);
         }
         fullRow = "  ";
-        for (int col = 0; col < BOARDWIDTH; col++) {
-            fullRow += Integer.toString(col + 1) + " ";
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            for (int col = 0; col < BOARDWIDTH; col++) {
+                fullRow += Integer.toString(col + 1) + " ";
+            }
+            fullRow += "  ";
         }
         System.out.println(fullRow);
     }
 
     public boolean checkVerticals() {
         boolean win = false;
-        for (int col = 0; col < BOARDWIDTH; col++) {
-            boolean set = board[col][0] != Status.NONE;
-            for (int g = 0; g < BOARDWIDTH; g++) {
-                set = set && board[col][0] == board[col][g];
+        for (int dep = 0; dep < BOARDWIDTH; dep++) {
+            for (int col = 0; col < BOARDWIDTH; col++) {
+                boolean set = board[col][0][dep] != Status.NONE;
+                for (int g = 0; g < BOARDWIDTH; g++) {
+                    set = set && board[col][0][dep] == board[col][g][dep];
+                }
+                win =  win || set;
             }
-                
-            win =  win || set;
         }
         return win;
     }
 
     public boolean checkHorizontals() {
         boolean win = false;
-        for (int ro = 0; ro < BOARDWIDTH; ro++) {
-            boolean set = board[0][ro] != Status.NONE;
-            for (int g = 0; g < BOARDWIDTH; g++) {
-                set = set && board[0][ro] == board[g][ro];
+        for (int dep = 0; dep < BOARDWIDTH; dep++) {
+            for (int ro = 0; ro < BOARDWIDTH; ro++) {
+                boolean set = board[0][ro][dep] != Status.NONE;
+                for (int g = 0; g < BOARDWIDTH; g++) {
+                    set = set && board[0][ro][dep] == board[g][ro][dep];
+                }  
+                win =  win || set;
             }
-                
-            win =  win || set;
+    }   
+        return win;
+    }
+
+    public boolean checkDepthals() {
+        boolean win = false;
+        for (int ro = 0; ro < BOARDWIDTH; ro++) {
+            for (int col = 0; col < BOARDWIDTH; col++) {
+                boolean set = board[col][ro][0] != Status.NONE;
+                for (int g = 1; g < BOARDWIDTH; g++) {
+                    set = set && board[col][ro][0] == board[col][ro][g];
+                }
+                win =  win || set;
+            }
         }
         return win;
     }
 
     public boolean checkDiagonals() {
         //negative slope
-        boolean negSet = board[0][0] != Status.NONE;
+        boolean negSet = board[0][0][0] != Status.NONE;
         for (int dia = 1; dia < BOARDWIDTH; dia++) {
-            negSet = negSet && board[dia][dia] == board[0][0];
+            negSet = negSet && board[dia][dia][dia] == board[0][0][0];
         }
         
         // positive slope
-
-        boolean posSet = board[SETBOARDWIDTH][0] != Status.NONE;
-        for (int dia = 0; dia < BOARDWIDTH; dia++) {
-            posSet = posSet && board[SETBOARDWIDTH - dia][dia] == board[SETBOARDWIDTH][0];
+        boolean posSet = board[SETBOARDWIDTH][0][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            posSet = posSet && board[SETBOARDWIDTH - dia][dia][dia] == board[SETBOARDWIDTH][0][0];
         }
         return posSet || negSet;
     }
 
+    public boolean checkCrosses() {
+        boolean setOne = board[0][0][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            setOne = setOne && board[dia][dia][dia] == board[0][0][0];
+        }
+
+        boolean setTwo = board[0][SETBOARDWIDTH][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            setTwo = setTwo && board[dia][SETBOARDWIDTH - dia][dia] == board[0][SETBOARDWIDTH][0];
+        }
+
+        boolean setThree = board[SETBOARDWIDTH][0][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            setThree = setThree && board[SETBOARDWIDTH - dia][dia][dia] == board[SETBOARDWIDTH][0][0];
+        }
+
+        boolean setFour = board[SETBOARDWIDTH][SETBOARDWIDTH][0] != Status.NONE;
+        for (int dia = 1; dia < BOARDWIDTH; dia++) {
+            setFour = setFour && board[SETBOARDWIDTH - dia][SETBOARDWIDTH - dia][dia] == board[SETBOARDWIDTH][SETBOARDWIDTH][0];
+        }
+        return setOne || setTwo || setThree || setFour;
+    }
+
     public boolean checkDraw() {
         boolean noDraw = false;
-        for (int column = 0; column < BOARDWIDTH; column++) {
-            for (int row = 0; row < BOARDWIDTH; row++) {
-                noDraw = noDraw || board[column][row] == Status.NONE;
+        for (int depth = 0; depth < BOARDWIDTH; depth++) {
+            for (int column = 0; column < BOARDWIDTH; column++) {
+                for (int row = 0; row < BOARDWIDTH; row++) {
+                    noDraw = noDraw || board[column][row][depth] == Status.NONE;
+                }
             }
         }
         return !(noDraw);
@@ -157,91 +210,18 @@ public class Board {
         
     }
 
-/* only in use for three-wide boards
-    public void inputThenEdit(String position, Status changer) {
-        Column inputColumn = Column.middle;
-        Row inputRow = Row.middle;
-        boolean recursion = false;
-
-        switch(position) {
-            case "top left":
-                inputColumn = Column.left;
-                inputRow = Row.top;
-                break;
-            case "top":
-                inputColumn = Column.middle;
-                inputRow = Row.top;
-                break;
-            case "top right":
-                inputColumn = Column.right;
-                inputRow = Row.top;
-                break;
-            case "left":
-                inputColumn = Column.left;
-                inputRow = Row.middle;
-                break;
-            case "middle":
-                inputColumn = Column.middle;
-                inputRow = Row.middle;
-                break;
-            case "right":
-                inputColumn = Column.right;
-                inputRow = Row.middle;
-                break;
-            case "bottom left":
-                inputColumn = Column.left;
-                inputRow = Row.bottom;
-                break;
-            case "bottom":
-                inputColumn = Column.middle;
-                inputRow = Row.bottom;
-                break;
-            case "bottom right":
-                inputColumn = Column.right;
-                inputRow = Row.bottom;
-                break;
-            case "help":
-                System.out.println("Command list:\ntop\nleft\nbottom\nright\nmiddle\ntop left\nbottom left\nbottom right\ntop right\npress enter to continue.");
-                while (scanner.nextLine() != "") {
-                }
-                recursion = true;
-                turnModule(changer);
-                break;
-
-            default:
-                System.out.println("Unfortunately, that's not a valid input. for a list of valid inputs, type 'help'");
-                turnModule(changer);
-                recursion = true;
-                break;
-        }
-        if (getStatus(inputColumn, inputRow) == Status.NONE && recursion == false) {
-            place(inputColumn, inputRow, changer);
-        }
-        else if (recursion == false){
-            System.out.println("Sorry, that spot is taken.");
-            turnModule(changer);
-        }
-    }
-*/ 
-
-/* only in use for three-wide boards
-    public void turnModuleThree(Status player) {
-        printBoard();
-            System.out.println("Where would you like to place the " + statusToString(player) + "? \n");
-            String placer = scanner.nextLine();
-            inputThenEdit(placer, player);
-    }
-*/
-
     public void turnModule(Status player) {
         printBoard();
+            System.out.println("In which layer would you like to place the " + statusToString(player) + "? \n");
+            int placerDepth = scanner.nextInt();
+            printBoard();
             System.out.println("In which column would you like to place the " + statusToString(player) + "? \n");
             int placerColumn = scanner.nextInt();
             printBoard();
             System.out.println("In which row would you like to place the " + statusToString(player) + "? \n");
             int placerRow = scanner.nextInt();
             System.out.println("\n\n");
-            controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, player);
+            controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, placerDepth - 1, player);
     }
 
     public Status play() {
