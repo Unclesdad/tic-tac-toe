@@ -290,7 +290,6 @@ public class Board {
                 return winner;
             }
 
-/* 
             turnModule(Status.O);
             if (checkWin()) {
                 winner = Status.O;
@@ -298,7 +297,6 @@ public class Board {
             } else if (checkDraw()) {
                 return winner;
             }
-*/
         }
         return winner;
     }
