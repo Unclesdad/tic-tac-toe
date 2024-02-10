@@ -147,17 +147,61 @@ public class Board {
 
     public boolean checkDiagonals() {
         //negative slope
-        boolean negSet = board[0][0][0] != Status.NONE;
-        for (int dia = 1; dia < BOARDWIDTH; dia++) {
-            negSet = negSet && board[dia][dia][dia] == board[0][0][0];
+        boolean win = false;
+
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean negSet = board[0][0][layer] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                negSet = negSet && board[dia][dia][layer] == board[0][0][layer];
+            }
+            win = win || negSet;
         }
         
         // positive slope
-        boolean posSet = board[SETBOARDWIDTH][0][0] != Status.NONE;
-        for (int dia = 1; dia < BOARDWIDTH; dia++) {
-            posSet = posSet && board[SETBOARDWIDTH - dia][dia][dia] == board[SETBOARDWIDTH][0][0];
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean posSet = board[SETBOARDWIDTH][0][layer] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                posSet = posSet && board[SETBOARDWIDTH - dia][dia][layer] == board[SETBOARDWIDTH][0][layer];
+            }
+            win = win || posSet;
         }
-        return posSet || negSet;
+        
+        //third dimension
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean setOne = board[layer][0][0] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                setOne = setOne && board[layer][dia][dia] == board[layer][0][0];
+            }
+            win = win || setOne;
+        }
+        
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean setTwo = board[layer][SETBOARDWIDTH][0] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                setTwo = setTwo && board[layer][SETBOARDWIDTH - dia][dia] == board[layer][SETBOARDWIDTH][0];
+            }
+            win = win || setTwo;
+        }
+
+        
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean setThree = board[0][layer][0] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                setThree = setThree && board[dia][layer][dia] == board[0][layer][0];
+            }
+            win = win || setThree;
+        }
+
+        
+        for (int layer = 0; layer < BOARDWIDTH; layer++) {
+            boolean setFour = board[0][layer][SETBOARDWIDTH] != Status.NONE;
+            for (int dia = 1; dia < BOARDWIDTH; dia++) {
+                setFour = setFour && board[SETBOARDWIDTH - dia][layer][dia] == board[SETBOARDWIDTH][layer][0];
+            }
+            win = win || setFour;
+        }
+
+        return win;
     }
 
     public boolean checkCrosses() {
@@ -206,20 +250,31 @@ public class Board {
         if (checkDiagonals()) {
             System.out.println("DIAGONALS");
         } */
-        return checkVerticals() || checkHorizontals() || checkDiagonals();
+        return checkVerticals() || checkHorizontals() || checkDiagonals() || checkCrosses() || checkDepthals();
         
+    }
+
+    public int accurateIntScan() {
+        int scan = scanner.nextInt();
+        if (scan > 0 && scan <= BOARDWIDTH) {
+            return scan;
+        }
+        else {
+            System.out.println("That is an invalid value. Please type a valid coordinate.");
+            return accurateIntScan();
+        }
     }
 
     public void turnModule(Status player) {
         printBoard();
             System.out.println("In which layer would you like to place the " + statusToString(player) + "? \n");
-            int placerDepth = scanner.nextInt();
+            int placerDepth = accurateIntScan();
             printBoard();
             System.out.println("In which column would you like to place the " + statusToString(player) + "? \n");
-            int placerColumn = scanner.nextInt();
+            int placerColumn = accurateIntScan();
             printBoard();
             System.out.println("In which row would you like to place the " + statusToString(player) + "? \n");
-            int placerRow = scanner.nextInt();
+            int placerRow = accurateIntScan();
             System.out.println("\n\n");
             controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, placerDepth - 1, player);
     }
@@ -235,7 +290,7 @@ public class Board {
                 return winner;
             }
 
-
+/* 
             turnModule(Status.O);
             if (checkWin()) {
                 winner = Status.O;
@@ -243,6 +298,7 @@ public class Board {
             } else if (checkDraw()) {
                 return winner;
             }
+*/
         }
         return winner;
     }
