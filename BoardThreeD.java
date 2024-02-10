@@ -1,21 +1,23 @@
 import java.util.Scanner;
 
-public class Board {
+public class BoardThreeD implements BoardIO{
     public static enum Status {X, O, NONE};
     public static enum Column {left, middle, right};
     public static enum Row {top, middle, bottom};
 
     static Scanner scanner = new Scanner(System.in);
 
-    
-    public static final int BOARDWIDTH = scanner.nextInt();
-    public static final int SETBOARDWIDTH = BOARDWIDTH - 1;
-
     int turnCount = 0;
 
-    Status[][][] board = new Status[BOARDWIDTH][BOARDWIDTH][BOARDWIDTH];
+    final int BOARDWIDTH;
+    final int SETBOARDWIDTH;
 
-    public Board() {
+    Status[][][] board;
+
+    public BoardThreeD() {
+        BOARDWIDTH = scanner.nextInt();
+        SETBOARDWIDTH = BOARDWIDTH - 1;
+        board = new Status[BOARDWIDTH][BOARDWIDTH][BOARDWIDTH];
         System.out.print("Alright then, let's play Tic Tac Toe!\n");
         for (int column = 0; column < BOARDWIDTH; column++) {
             for (int row = 0; row < BOARDWIDTH; row++) {
@@ -40,6 +42,15 @@ public class Board {
             case middle: return 1;
             case bottom: return 2;
             default: return -1;
+        }
+    }
+
+    public static String statusToString(BoardTwoD.Status s) {
+        switch(s) {
+            case X: return "X";
+            case O: return "O";
+            case NONE: return "-";
+            default: return "ERROR";
         }
     }
 
@@ -279,12 +290,12 @@ public class Board {
             controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, placerDepth - 1, player);
     }
 
-    public Status play() {
-        Status winner = Status.NONE;
-        while (winner == Status.NONE) {
+    public BoardTwoD.Status play() {
+        BoardTwoD.Status winner = BoardTwoD.Status.NONE;
+        while (winner == BoardTwoD.Status.NONE) {
             turnModule(Status.X);
             if (checkWin()) {
-                winner = Status.X;
+                winner = BoardTwoD.Status.X;
                 return winner;
             } else if (checkDraw()) {
                 return winner;
@@ -292,7 +303,7 @@ public class Board {
 
             turnModule(Status.O);
             if (checkWin()) {
-                winner = Status.O;
+                winner = BoardTwoD.Status.O;
                 return winner;
             } else if (checkDraw()) {
                 return winner;
