@@ -108,8 +108,8 @@ public class Board {
         for (int dep = 0; dep < BOARDWIDTH; dep++) {
             for (int col = 0; col < BOARDWIDTH; col++) {
                 boolean set = board[col][0][dep] != Status.NONE;
-                for (int g = 0; g < BOARDWIDTH; g++) {
-                    set = set && board[col][0][dep] == board[col][g][dep];
+                for (int ro = 0; ro < BOARDWIDTH; ro++) {
+                    set = set && board[col][0][dep] == board[col][ro][dep];
                 }
                 win =  win || set;
             }
@@ -290,7 +290,6 @@ public class Board {
                 return winner;
             }
 
-/* 
             turnModule(Status.O);
             if (checkWin()) {
                 winner = Status.O;
@@ -298,7 +297,6 @@ public class Board {
             } else if (checkDraw()) {
                 return winner;
             }
-*/
         }
         return winner;
     }
