@@ -118,8 +118,42 @@ public class BoardTwoD implements BoardIO{
 
     public boolean checkWin() {
         return checkVerticals() || checkHorizontals() || checkDiagonals();
-        
     }
+
+// ai !!!!!
+
+    public boolean aiOneTurnWin(Status aiPlayer) {
+        
+        // verticals!!!
+        for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
+            Status baseBoard = missingValue != 0 ? board[0][0] : board[0][1];
+
+            for (int col = 0; col < BOARDWIDTH; col++) {
+                boolean set = board[col][missingValue] == Status.NONE;
+
+                for (int ro = 0; ro < BOARDWIDTH; ro++) {
+                    if (ro != missingValue) {
+                       set = set && board[col][ro] == baseBoard;
+                    }
+                }
+                if (set) {
+                    board[col][missingValue] = aiPlayer;
+                    return true;
+                }
+
+            }
+        }
+
+        // horizontals!!!
+
+        return false;
+    }
+
+
+
+
+
+
 
     public int accurateIntScan() {
         int scan = scanner.nextInt();
