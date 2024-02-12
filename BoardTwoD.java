@@ -24,12 +24,23 @@ public class BoardTwoD implements BoardIO{
         }
     }
 
+    public static Status oppositeStatus(Status s) {
+        switch(s) {
+            case X: return Status.O;
+            case O: return Status.X;
+            case NONE: 
+                throw new RuntimeException("Status.NONE was passed through oppositeStatus(). that's not supposed to happen.");
+            default: throw new RuntimeException();
+
+        }
+    }
+
     public static String statusToString(Status s) {
         switch(s) {
             case X: return "X";
             case O: return "O";
             case NONE: return "-";
-            default: return "ERROR";
+            default: throw new RuntimeException();
         }
     }
 
@@ -125,26 +136,71 @@ public class BoardTwoD implements BoardIO{
     public boolean aiOneTurnWin(Status aiPlayer) {
         
         // verticals!!!
-        for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
-            Status baseBoard = missingValue != 0 ? board[0][0] : board[0][1];
+        for (int col = 0; col < BOARDWIDTH; col++) {
 
-            for (int col = 0; col < BOARDWIDTH; col++) {
+            for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
+            //Status baseBoard = missingValue != 0 ? board[0][0] : board[0][1];  used previously. might use again
+
                 boolean set = board[col][missingValue] == Status.NONE;
 
                 for (int ro = 0; ro < BOARDWIDTH; ro++) {
                     if (ro != missingValue) {
-                       set = set && board[col][ro] == baseBoard;
+                       set = set && board[col][ro] == aiPlayer;
                     }
                 }
                 if (set) {
                     board[col][missingValue] = aiPlayer;
                     return true;
                 }
-
             }
         }
 
         // horizontals!!!
+        for (int ro = 0; ro < BOARDWIDTH; ro++) {
+
+            for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
+            
+                boolean set = board[missingValue][ro] == Status.NONE;
+
+                for (int col = 0; col < BOARDWIDTH; col++) {
+                    if (col != missingValue) {
+                       set = set && board[col][ro] == aiPlayer;
+                    }
+                }
+                if (set) {
+                    board[missingValue][ro] = aiPlayer;
+                    return true;
+                }
+            }
+        }
+
+        // diagonal negative slope!!!
+        for (int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
+            boolean set = board[missingValue][missingValue] == Status.NONE;
+            for (int dia = 0; dia < BOARDWIDTH; dia++) {
+                if (dia != missingValue) {
+                    set = set && board[dia][dia] == aiPlayer;
+                }
+            }
+            if (set) {
+                board[missingValue][missingValue] = aiPlayer;
+                return true;
+            }
+        }
+
+        for (int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
+            boolean set = board[missingValue][missingValue] == Status.NONE;
+            for (int dia = 0; dia < BOARDWIDTH; dia++) {
+                if (dia != missingValue) {
+                    set = set && board[SETBOARDWIDTH - dia][dia] == aiPlayer;
+                }
+            }
+            if (set) {
+                board[missingValue][missingValue] = aiPlayer;
+                return true;
+            }
+        }
+
 
         return false;
     }
