@@ -1,6 +1,8 @@
 public interface BoardIO {
 
-    public BoardTwoD.Status play();
+    public static enum Status {X, O, NONE};
+
+    public BoardIO.Status play();
 
     public void printBoard();
 }

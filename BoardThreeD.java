@@ -1,9 +1,6 @@
 import java.util.Scanner;
 
 public class BoardThreeD implements BoardIO{
-    public static enum Status {X, O, NONE};
-    public static enum Column {left, middle, right};
-    public static enum Row {top, middle, bottom};
 
     static Scanner scanner = new Scanner(System.in);
 
@@ -28,32 +25,6 @@ public class BoardThreeD implements BoardIO{
         }
     }
 
-    public static int enumToInt(Column col) {
-        switch(col) {
-            case left: return 0;
-            case middle: return 1;
-            case right: return 2;
-            default: return -1;
-        }
-    }
-    public static int enumToInt(Row ro) {
-        switch(ro) {
-            case top: return 0;
-            case middle: return 1;
-            case bottom: return 2;
-            default: return -1;
-        }
-    }
-
-    public static String statusToString(BoardTwoD.Status s) {
-        switch(s) {
-            case X: return "X";
-            case O: return "O";
-            case NONE: return "-";
-            default: return "ERROR";
-        }
-    }
-
     public static String statusToString(Status s) {
         switch(s) {
             case X: return "X";
@@ -62,12 +33,6 @@ public class BoardThreeD implements BoardIO{
             default: return "ERROR";
         }
     }
-    
-    /* only in use for three-wide boards
-    public void place(Column targColumn, Row targRow, Status piece) {
-        board[enumToInt(targColumn)][enumToInt(targRow)] = piece;
-    }
-    */
 
     public void place(int targColumn, int targRow, int targDepth, Status piece) {
         board[targColumn][targRow][targDepth] = piece;
@@ -82,10 +47,6 @@ public class BoardThreeD implements BoardIO{
             turnModule(piece);
         }
     }
-    /* only in use for three-wide boards
-    public Status getStatus(Column targColumn, Row targRow) {
-        return board[enumToInt(targColumn)][enumToInt(targRow)];
-    } */
 
     public void printBoard() {
         String fullRow = "  ";
@@ -251,16 +212,6 @@ public class BoardThreeD implements BoardIO{
     }
 
     public boolean checkWin() {
-        /* testing shit
-        if (checkHorizontals()) {
-            System.out.println("HORIZONTALS");
-        }
-        if (checkVerticals()) {
-            System.out.println("VERTICALS");
-        }
-        if (checkDiagonals()) {
-            System.out.println("DIAGONALS");
-        } */
         return checkVerticals() || checkHorizontals() || checkDiagonals() || checkCrosses() || checkDepthals();
         
     }
@@ -290,12 +241,12 @@ public class BoardThreeD implements BoardIO{
             controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, placerDepth - 1, player);
     }
 
-    public BoardTwoD.Status play() {
-        BoardTwoD.Status winner = BoardTwoD.Status.NONE;
-        while (winner == BoardTwoD.Status.NONE) {
+    public Status play() {
+        Status winner = Status.NONE;
+        while (winner == Status.NONE) {
             turnModule(Status.X);
             if (checkWin()) {
-                winner = BoardTwoD.Status.X;
+                winner = Status.X;
                 return winner;
             } else if (checkDraw()) {
                 return winner;
@@ -303,7 +254,7 @@ public class BoardThreeD implements BoardIO{
 
             turnModule(Status.O);
             if (checkWin()) {
-                winner = BoardTwoD.Status.O;
+                winner = Status.O;
                 return winner;
             } else if (checkDraw()) {
                 return winner;

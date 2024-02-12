@@ -2,9 +2,6 @@
     import java.util.Scanner;
 
 public class BoardTwoD implements BoardIO{
-    public static enum Status {X, O, NONE};
-    public static enum Column {left, middle, right};
-    public static enum Row {top, middle, bottom};
 
     static Scanner scanner = new Scanner(System.in);
 
@@ -120,16 +117,6 @@ public class BoardTwoD implements BoardIO{
     }
 
     public boolean checkWin() {
-        /* testing shit
-        if (checkHorizontals()) {
-            System.out.println("HORIZONTALS");
-        }
-        if (checkVerticals()) {
-            System.out.println("VERTICALS");
-        }
-        if (checkDiagonals()) {
-            System.out.println("DIAGONALS");
-        } */
         return checkVerticals() || checkHorizontals() || checkDiagonals();
         
     }
