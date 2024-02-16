@@ -62,6 +62,9 @@ public class BoardTwoD implements BoardIO{
         }
         return false;
     }
+    public boolean controlledPlace(int targColumn, int targRow, Status piece) {
+        return controlledPlace(targColumn, targRow, piece, false);
+    }
 
     public void printBoard() {
         String fullRow = "";
@@ -138,9 +141,11 @@ public class BoardTwoD implements BoardIO{
 
 // ai !!!!!
 
-    public boolean aiOneTurnWin(Status aiPlayer, boolean self) {
-        Status checker = self ? aiPlayer : oppositeStatus(aiPlayer);
-        // verticals!!!
+    public int[][] possibleWinChecker(Status checker) {
+        int count = 0;
+        int[][] duos = new int[2][];
+
+        // they call me vertical
         for (int col = 0; col < BOARDWIDTH; col++) {
 
             for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
@@ -154,13 +159,14 @@ public class BoardTwoD implements BoardIO{
                     }
                 }
                 if (set) {
-                    controlledPlace(col, missingValue, aiPlayer, false);
-                    return true;
+                    duos[0][count] = col;
+                    duos[1][count] = missingValue;
+                    count++;
                 }
             }
         }
 
-        // horizontals!!!
+        // they call me horizontal
         for (int ro = 0; ro < BOARDWIDTH; ro++) {
 
             for(int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
@@ -173,13 +179,14 @@ public class BoardTwoD implements BoardIO{
                     }
                 }
                 if (set) {
-                    controlledPlace(missingValue, ro, aiPlayer, false);
-                    return true;
+                    duos[0][count] = missingValue;
+                    duos[1][count] = ro;
+                    count++;
                 }
             }
         }
 
-        // diagonal negative slope!!!
+        // they call me negative slope diagonal
         for (int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
             boolean set = board[missingValue][missingValue] == Status.NONE;
             for (int dia = 0; dia < BOARDWIDTH; dia++) {
@@ -188,25 +195,35 @@ public class BoardTwoD implements BoardIO{
                 }
             }
             if (set) {
-                controlledPlace(missingValue, missingValue, aiPlayer, false);
-                return true;
+                duos[0][count] = missingValue;
+                duos[1][count] = missingValue;
+                count++;
             }
         }
 
+        // they call me positive slope diagonal
         for (int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
             boolean set = board[SETBOARDWIDTH - missingValue][missingValue] == Status.NONE;
             for (int dia = 0; dia < BOARDWIDTH; dia++) {
                 if (dia != missingValue) {
-                    set = set && board[SETBOARDWIDTH - dia][dia] == aiPlayer;
+                    set = set && board[SETBOARDWIDTH - dia][dia] == checker;
                 }
             }
             if (set) {
-                controlledPlace(SETBOARDWIDTH - missingValue, missingValue, aiPlayer, false);
-                return true;
+                duos[0][count] = SETBOARDWIDTH - missingValue;
+                duos[1][count] = missingValue;
             }
         }
 
+        return duos;
+    }
 
+    public boolean aiOneTurnWin(Status aiPlayer, boolean self) {
+        int[][] duos = self ? possibleWinChecker(aiPlayer) : possibleWinChecker(oppositeStatus(aiPlayer));
+        if (duos[0].length != 0) {
+            controlledPlace(duos[0][0], duos[1][0], aiPlayer);
+            return true;
+        }
         return false;
     }
 
@@ -215,19 +232,18 @@ public class BoardTwoD implements BoardIO{
         }
         else if (aiOneTurnWin(player, false)) {
         }
-        else if (controlledPlace(SETBOARDWIDTH / 2, SETBOARDWIDTH / 2, player, false)) {
+        else if (controlledPlace(SETBOARDWIDTH / 2, SETBOARDWIDTH / 2, player)) {
         }
-        else if (controlledPlace(0, 0, player, false)) {
+        else if (controlledPlace(0, 0, player)) {
         }
-        else if (controlledPlace(0, SETBOARDWIDTH, player, false)) {
+        else if (controlledPlace(0, SETBOARDWIDTH, player)) {
         }
-        else if (controlledPlace(SETBOARDWIDTH, 0, player, false)) {
+        else if (controlledPlace(SETBOARDWIDTH, 0, player)) {
         }
-        else if (controlledPlace(SETBOARDWIDTH, SETBOARDWIDTH, player, false)) {
+        else if (controlledPlace(SETBOARDWIDTH, SETBOARDWIDTH, player)) {
         }
         else {
-            while (!controlledPlace(rand.nextInt(BOARDWIDTH), rand.nextInt(BOARDWIDTH), player, false)) {
-            }
+            while (!controlledPlace(rand.nextInt(BOARDWIDTH), rand.nextInt(BOARDWIDTH), player)) {}
         }
     }
 
