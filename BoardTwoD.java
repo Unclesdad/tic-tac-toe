@@ -210,35 +210,24 @@ public class BoardTwoD implements BoardIO{
         return false;
     }
 
-    public boolean aiTurn(Status player) {
-        boolean finish = true;
+    public void aiTurn(Status player) {
         if (aiOneTurnWin(player, true)) {
-            return true;
         }
         else if (aiOneTurnWin(player, false)) {
-            return true;
         }
         else if (controlledPlace(SETBOARDWIDTH / 2, SETBOARDWIDTH / 2, player, false)) {
-            return true;
         }
         else if (controlledPlace(0, 0, player, false)) {
-            return true;
         }
         else if (controlledPlace(0, SETBOARDWIDTH, player, false)) {
-            return true;
         }
         else if (controlledPlace(SETBOARDWIDTH, 0, player, false)) {
-            return true;
         }
         else if (controlledPlace(SETBOARDWIDTH, SETBOARDWIDTH, player, false)) {
-            return true;
         }
         else {
-            while (!finish) {
-                rand.nextInt(turnCount);
-                finish = controlledPlace(rand.nextInt(BOARDWIDTH), rand.nextInt(BOARDWIDTH), player, false);
+            while (!controlledPlace(rand.nextInt(BOARDWIDTH), rand.nextInt(BOARDWIDTH), player, false)) {
             }
-            return true;
         }
     }
 
