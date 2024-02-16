@@ -1,7 +1,10 @@
 
-    import java.util.Scanner;
+import java.util.Random;
+import java.util.Scanner;
 
 public class BoardTwoD implements BoardIO{
+
+    Random rand = new Random();
 
     static Scanner scanner = new Scanner(System.in);
 
@@ -12,8 +15,8 @@ public class BoardTwoD implements BoardIO{
     final int BOARDWIDTH;
     final int SETBOARDWIDTH;
 
-    public BoardTwoD() {
-        BOARDWIDTH = scanner.nextInt();
+    public BoardTwoD(int boardwidth) {
+        BOARDWIDTH = boardwidth > 0 ? boardwidth : 3;
         SETBOARDWIDTH = BOARDWIDTH - 1;
         board = new Status[BOARDWIDTH][BOARDWIDTH];
         System.out.print("Alright then, let's play Tic Tac Toe!\n");
@@ -48,14 +51,16 @@ public class BoardTwoD implements BoardIO{
         board[targColumn][targRow] = piece;
     }
 
-    public void controlledPlace(int targColumn, int targRow, Status piece) {
+    public boolean controlledPlace(int targColumn, int targRow, Status piece, boolean retryIfTaken) {
         if (board[targColumn][targRow] == Status.NONE) {
             place(targColumn, targRow, piece);
+            return true;
         }
-        else {
+        else if (retryIfTaken) {
             System.out.println("Sorry, that spot is taken.");
             turnModule(piece);
         }
+        return false;
     }
 
     public void printBoard() {
@@ -133,8 +138,8 @@ public class BoardTwoD implements BoardIO{
 
 // ai !!!!!
 
-    public boolean aiOneTurnWin(Status aiPlayer) {
-        
+    public boolean aiOneTurnWin(Status aiPlayer, boolean self) {
+        Status checker = self ? aiPlayer : oppositeStatus(aiPlayer);
         // verticals!!!
         for (int col = 0; col < BOARDWIDTH; col++) {
 
@@ -145,11 +150,11 @@ public class BoardTwoD implements BoardIO{
 
                 for (int ro = 0; ro < BOARDWIDTH; ro++) {
                     if (ro != missingValue) {
-                       set = set && board[col][ro] == aiPlayer;
+                       set = set && board[col][ro] == checker;
                     }
                 }
                 if (set) {
-                    board[col][missingValue] = aiPlayer;
+                    controlledPlace(col, missingValue, aiPlayer, false);
                     return true;
                 }
             }
@@ -164,11 +169,11 @@ public class BoardTwoD implements BoardIO{
 
                 for (int col = 0; col < BOARDWIDTH; col++) {
                     if (col != missingValue) {
-                       set = set && board[col][ro] == aiPlayer;
+                       set = set && board[col][ro] == checker;
                     }
                 }
                 if (set) {
-                    board[missingValue][ro] = aiPlayer;
+                    controlledPlace(missingValue, ro, aiPlayer, false);
                     return true;
                 }
             }
@@ -179,24 +184,24 @@ public class BoardTwoD implements BoardIO{
             boolean set = board[missingValue][missingValue] == Status.NONE;
             for (int dia = 0; dia < BOARDWIDTH; dia++) {
                 if (dia != missingValue) {
-                    set = set && board[dia][dia] == aiPlayer;
+                    set = set && board[dia][dia] == checker;
                 }
             }
             if (set) {
-                board[missingValue][missingValue] = aiPlayer;
+                controlledPlace(missingValue, missingValue, aiPlayer, false);
                 return true;
             }
         }
 
         for (int missingValue = 0; missingValue < BOARDWIDTH; missingValue++) {
-            boolean set = board[missingValue][missingValue] == Status.NONE;
+            boolean set = board[SETBOARDWIDTH - missingValue][missingValue] == Status.NONE;
             for (int dia = 0; dia < BOARDWIDTH; dia++) {
                 if (dia != missingValue) {
                     set = set && board[SETBOARDWIDTH - dia][dia] == aiPlayer;
                 }
             }
             if (set) {
-                board[missingValue][missingValue] = aiPlayer;
+                controlledPlace(SETBOARDWIDTH - missingValue, missingValue, aiPlayer, false);
                 return true;
             }
         }
@@ -205,6 +210,37 @@ public class BoardTwoD implements BoardIO{
         return false;
     }
 
+    public boolean aiTurn(Status player) {
+        boolean finish = true;
+        if (aiOneTurnWin(player, true)) {
+            return true;
+        }
+        else if (aiOneTurnWin(player, false)) {
+            return true;
+        }
+        else if (controlledPlace(SETBOARDWIDTH / 2, SETBOARDWIDTH / 2, player, false)) {
+            return true;
+        }
+        else if (controlledPlace(0, 0, player, false)) {
+            return true;
+        }
+        else if (controlledPlace(0, SETBOARDWIDTH, player, false)) {
+            return true;
+        }
+        else if (controlledPlace(SETBOARDWIDTH, 0, player, false)) {
+            return true;
+        }
+        else if (controlledPlace(SETBOARDWIDTH, SETBOARDWIDTH, player, false)) {
+            return true;
+        }
+        else {
+            while (!finish) {
+                rand.nextInt(turnCount);
+                finish = controlledPlace(rand.nextInt(BOARDWIDTH), rand.nextInt(BOARDWIDTH), player, false);
+            }
+            return true;
+        }
+    }
 
 
 
@@ -230,7 +266,7 @@ public class BoardTwoD implements BoardIO{
         System.out.println("In which row would you like to place the " + statusToString(player) + "? \n");
         int placerRow = accurateIntScan();
         System.out.println("\n\n");
-        controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, player);
+        controlledPlace(placerColumn - 1, BOARDWIDTH - placerRow, player, true);
     }
 
     public Status play() {
@@ -244,7 +280,7 @@ public class BoardTwoD implements BoardIO{
                 return winner;
             }
 
-            turnModule(Status.O);
+            aiTurn(Status.O);
             if (checkWin()) {
                 winner = Status.O;
                 return winner;

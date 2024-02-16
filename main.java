@@ -10,8 +10,13 @@ public class Main {
         }
 
         System.out.println("Please enter board width:");
+        int boardwidth = BoardThreeD.scanner.nextInt();
+        while (boardwidth < 0) {
+            System.out.println("Please enter a positive number.");
+            boardwidth = BoardThreeD.scanner.nextInt();
+        }
 
-        BoardIO playBoard = dimensionNumber == 3 ? new BoardThreeD() : new BoardTwoD();
+        BoardIO playBoard = dimensionNumber == 3 ? new BoardThreeD(boardwidth) : new BoardTwoD(boardwidth);
 
         BoardTwoD.Status winner = playBoard.play();
 

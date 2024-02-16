@@ -1,3 +1,5 @@
+
+
 public class Test {
 
     public static void assertB(boolean condition) {
@@ -10,6 +12,12 @@ public class Test {
     }
 
     public static void test() {
-        assertB(true);
+        assertB(!false);
+
+        BoardTwoD testBoardOne = new BoardTwoD(3);
+        testBoardOne.controlledPlace(1, 0, BoardIO.Status.X, false);
+        //testBoardOne.controlledPlace(1, 1, BoardIO.Status.X);
+        testBoardOne.controlledPlace(1, 2, BoardIO.Status.X, false);
+        assertB(testBoardOne.aiOneTurnWin(BoardIO.Status.X, true));
     }
 }

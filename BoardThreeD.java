@@ -11,8 +11,8 @@ public class BoardThreeD implements BoardIO{
 
     Status[][][] board;
 
-    public BoardThreeD() {
-        BOARDWIDTH = scanner.nextInt();
+    public BoardThreeD(int boardwidth) {
+        BOARDWIDTH = boardwidth;
         SETBOARDWIDTH = BOARDWIDTH - 1;
         board = new Status[BOARDWIDTH][BOARDWIDTH][BOARDWIDTH];
         System.out.print("Alright then, let's play Tic Tac Toe!\n");
